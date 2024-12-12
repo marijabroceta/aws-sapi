@@ -1,0 +1,46 @@
+#%RAML 1.0
+title: aws-sapi
+version: v1
+baseUri: http://localhost:8081/covid/v1
+securitySchemes:
+  basic: !include /exchange_modules/273e9569-9c5a-4bc1-bf1e-37f44b654636/uho-basic-auth-security-schema/1.0.0/uho-basic-auth-security-schema.raml
+
+traits:
+  correlation-id-header: !include /exchange_modules/273e9569-9c5a-4bc1-bf1e-37f44b654636/x-correlation-id/1.0.0/x-correlation-id.raml
+
+  transaction-id-header: !include /exchange_modules/273e9569-9c5a-4bc1-bf1e-37f44b654636/x-transaction-id/1.0.0/x-transaction-id.raml
+
+uses:
+  aws-sapi-library: /aws-sapi-library/aws-sapi-library.raml
+  uho-common-data-types: /exchange_modules/273e9569-9c5a-4bc1-bf1e-37f44b654636/uho-common-data-types-library/1.0.0/uho-common-data-types-library.raml
+
+/document:
+  post:
+    securedBy: [basic]
+    is: [correlation-id-header, transaction-id-header]
+    body:
+      application/json:
+        type: aws-sapi-library.upload-s3-document-request-payload
+        example: !include /examples/upload-s3-document-request-payload.json
+    responses:
+      200:
+        body:
+          application/json:
+            type: aws-sapi-library.upload-s3-document-response-payload
+            example: !include /examples/upload-s3-document-response-payload.json
+      400:
+        body:
+          application/json:
+            type: uho-common-data-types.error-response-type
+            example: !include /examples/400.json
+      503:
+        body:
+          application/json:
+            type: uho-common-data-types.error-response-type
+            example: !include /examples/503.json
+      500:
+        body:
+          application/json:
+            type: uho-common-data-types.error-response-type
+            example: !include /examples/500.json
+      
